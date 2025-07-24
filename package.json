@@ -4,7 +4,7 @@
 	"description": "Aplicación web para recopilar y mostrar frases sobre fiestas",
 	"main": "server.js",
 	"scripts": {
-		"start": "node server.js",
+		"start": "NODE_ENV=production node server.js",
 		"dev": "node server.js"
 	},
 	"keywords": [],
