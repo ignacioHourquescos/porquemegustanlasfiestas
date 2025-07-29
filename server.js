@@ -84,34 +84,34 @@ app.get("/", (req, res) => {
           justify-content: center;
           align-items: center;
           background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-          padding: 20px;
+          padding: 10px;
         }
         
         .container {
           max-width: 600px;
           width: 100%;
           background: white;
-          padding: 40px;
+          padding: 20px;
           border-radius: 16px;
           box-shadow: 0 10px 30px rgba(0,0,0,0.1);
         }
         
         h1 {
           color: #2d3748;
-          margin-bottom: 30px;
-          font-size: 2rem;
+          margin-bottom: 15px;
+          font-size: 1.5rem;
           text-align: center;
         }
         
         form {
           display: flex;
           flex-direction: column;
-          gap: 20px;
+          gap: 15px;
         }
         
         textarea {
           width: 100%;
-          min-height: 120px;
+          min-height: 150px;
           padding: 15px;
           border: 2px solid #e2e8f0;
           border-radius: 8px;
@@ -157,11 +157,32 @@ app.get("/", (req, res) => {
           background: #fed7d7;
           color: #c53030;
         }
+
+        @media (max-width: 480px) {
+          body {
+            padding: 0;
+          }
+
+          .container {
+            min-height: 100vh;
+            border-radius: 0;
+            padding: 15px;
+          }
+
+          h1 {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+          }
+
+          textarea {
+            min-height: 200px;
+          }
+        }
       </style>
     </head>
     <body>
       <div class="container">
-        <h1>¿Por qué te gustan las fiestas?</h1>
+        <h1>Me gustan las fiestas por que</h1>
         <form id="fraseForm">
           <textarea 
             name="texto" 

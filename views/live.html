@@ -5,6 +5,9 @@
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
       <title>Me gustan las fiestas porque</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
       <style>
             * {
                   margin: 0;
@@ -21,7 +24,7 @@
                   position: relative;
             }
 
-            .wave-animation {
+            .wave-container {
                   position: fixed;
                   top: 0;
                   left: 0;
@@ -30,41 +33,139 @@
                   pointer-events: none;
                   z-index: 1;
                   opacity: 0;
+                  visibility: hidden;
+            }
+
+            .wave-container.active {
+                  opacity: 1;
+                  visibility: visible;
+                  animation: fadeInOut 2s ease-in-out forwards;
+            }
+
+            .wave {
+                  position: absolute;
+                  width: 200%;
+                  height: 200%;
                   background: linear-gradient(45deg,
                               #FFD700,
-                              /* Amarillo brillante */
+                              /* Amarillo */
                               #FF1493,
-                              /* Rosa fuerte */
+                              /* Rosa */
                               #4B0082,
                               /* Índigo */
                               #9370DB,
-                              /* Púrpura medio */
-                              #32CD32
-                              /* Verde lima */
+                              /* Púrpura */
+                              #90EE90
+                              /* Verde claro */
                         );
-                  background-size: 400% 400%;
-                  animation: waveColors 3s ease-in-out forwards;
-                  mix-blend-mode: overlay;
+                  opacity: 0.4;
+                  mix-blend-mode: soft-light;
+                  transform-origin: center;
             }
 
-            @keyframes waveColors {
+            .wave1 {
+                  animation: wave1 2s ease-in-out infinite;
+            }
+
+            .wave2 {
+                  animation: wave2 2s ease-in-out infinite 0.2s;
+            }
+
+            .wave3 {
+                  animation: wave3 2s ease-in-out infinite 0.4s;
+            }
+
+            .wave4 {
+                  animation: wave4 2s ease-in-out infinite 0.6s;
+            }
+
+            @keyframes fadeInOut {
                   0% {
                         opacity: 0;
-                        background-position: 0% 50%;
                   }
 
-                  20% {
-                        opacity: 0.7;
+                  30% {
+                        opacity: 0.4;
                   }
 
-                  80% {
-                        opacity: 0.7;
-                        background-position: 100% 50%;
+                  70% {
+                        opacity: 0.4;
                   }
 
                   100% {
                         opacity: 0;
-                        background-position: 0% 50%;
+                  }
+            }
+
+            @keyframes wave1 {
+                  0% {
+                        transform: translate(-50%, -50%) rotate(0deg) scale(1) skew(0deg);
+                  }
+
+                  33% {
+                        transform: translate(-45%, -55%) rotate(120deg) scale(1.2) skew(-5deg);
+                  }
+
+                  66% {
+                        transform: translate(-55%, -45%) rotate(240deg) scale(1.1) skew(5deg);
+                  }
+
+                  100% {
+                        transform: translate(-50%, -50%) rotate(360deg) scale(1) skew(0deg);
+                  }
+            }
+
+            @keyframes wave2 {
+                  0% {
+                        transform: translate(-50%, -50%) rotate(90deg) scale(1.1) skew(5deg);
+                  }
+
+                  33% {
+                        transform: translate(-55%, -45%) rotate(210deg) scale(1.3) skew(-5deg);
+                  }
+
+                  66% {
+                        transform: translate(-45%, -55%) rotate(330deg) scale(1.2) skew(5deg);
+                  }
+
+                  100% {
+                        transform: translate(-50%, -50%) rotate(450deg) scale(1.1) skew(-5deg);
+                  }
+            }
+
+            @keyframes wave3 {
+                  0% {
+                        transform: translate(-50%, -50%) rotate(180deg) scale(1.2) skew(-5deg);
+                  }
+
+                  33% {
+                        transform: translate(-45%, -55%) rotate(300deg) scale(1.4) skew(5deg);
+                  }
+
+                  66% {
+                        transform: translate(-55%, -45%) rotate(420deg) scale(1.3) skew(-5deg);
+                  }
+
+                  100% {
+                        transform: translate(-50%, -50%) rotate(540deg) scale(1.2) skew(5deg);
+                  }
+            }
+
+            @keyframes wave4 {
+                  0% {
+                        transform: translate(-50%, -50%) rotate(270deg) scale(1.3) skew(5deg);
+                  }
+
+                  33% {
+                        transform: translate(-55%, -45%) rotate(390deg) scale(1.5) skew(-5deg);
+                  }
+
+                  66% {
+                        transform: translate(-45%, -55%) rotate(510deg) scale(1.4) skew(5deg);
+                  }
+
+                  100% {
+                        transform: translate(-50%, -50%) rotate(630deg) scale(1.3) skew(-5deg);
                   }
             }
 
@@ -80,17 +181,20 @@
             }
 
             .frase {
+                  font-family: 'Syne Mono', monospace;
                   font-size: 3rem;
                   line-height: 1.2;
-                  color: #2d3748;
+                  color: #000000;
                   white-space: nowrap;
                   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+                  letter-spacing: 0.02em;
             }
 
             .razon {
+                  font-family: 'Syne Mono', monospace;
                   font-size: 3rem;
                   line-height: 1.2;
-                  color: #f56565;
+                  color: #a513d6;
                   display: block;
                   margin-top: 20px;
                   transition: all 0.5s ease-in-out;
@@ -99,7 +203,10 @@
 
             @media (max-width: 768px) {
 
-                  .frase,
+                  .frase {
+                        font-size: 2.5rem;
+                  }
+
                   .razon {
                         font-size: 2rem;
                   }
@@ -107,7 +214,10 @@
 
             @media (max-width: 480px) {
 
-                  .frase,
+                  .frase {
+                        font-size: 2rem;
+                  }
+
                   .razon {
                         font-size: 1.5rem;
                   }
@@ -121,7 +231,12 @@
 </head>
 
 <body>
-      <div class="wave-animation"></div>
+      <div class="wave-container">
+            <div class="wave wave1"></div>
+            <div class="wave wave2"></div>
+            <div class="wave wave3"></div>
+            <div class="wave wave4"></div>
+      </div>
       <div class="container">
             <h1 class="frase">Me gustan las fiestas por que</h1>
             <div class="razon">...</div>
@@ -130,48 +245,75 @@
       <script>
             const socket = io();
             const razonDiv = document.querySelector('.razon');
-            const waveAnimation = document.querySelector('.wave-animation');
+            const waveContainer = document.querySelector('.wave-container');
             let frases = [];
             let currentIndex = 0;
-            let intervalId = null; // Para poder limpiar el intervalo anterior
+            let timeoutId = null;
 
-            // Función para calcular el tiempo basado en la longitud del texto
+            // Función para calcular el tiempo de lectura basado en la longitud del texto
             function calcularTiempoLectura(texto) {
-                  const TIEMPO_BASE = 2000; // 2 segundos mínimo
-                  const TIEMPO_POR_CARACTER = 100; // 100ms por caracter
-                  return TIEMPO_BASE + (texto.length * TIEMPO_POR_CARACTER);
+                  // Velocidad más lenta de lectura: aproximadamente 100 palabras por minuto
+                  // Aproximadamente 15 caracteres por palabra en español
+                  const CARACTERES_POR_PALABRA = 15;
+                  const MS_POR_PALABRA = 600; // 600ms por palabra (el doble del tiempo anterior)
+                  const TIEMPO_MINIMO = 5000; // Mínimo 5 segundos
+                  const TIEMPO_MAXIMO = 15000; // Máximo 15 segundos
+
+                  // Calculamos palabras aproximadas y tiempo necesario
+                  const palabrasAproximadas = Math.ceil(texto.length / CARACTERES_POR_PALABRA);
+                  const tiempoCalculado = palabrasAproximadas * MS_POR_PALABRA;
+
+                  // Agregamos un tiempo extra para frases muy largas
+                  const tiempoExtra = texto.length > 100 ? 2000 : 0; // 2 segundos extra para frases largas
+
+                  // Aseguramos que el tiempo esté entre el mínimo y máximo
+                  return Math.min(Math.max(tiempoCalculado + tiempoExtra, TIEMPO_MINIMO), TIEMPO_MAXIMO);
+            }
+
+            function getRandomTransform() {
+                  const randomRotate = Math.random() * 360;
+                  const randomScale = 0.8 + Math.random() * 0.7;
+                  const randomSkew = -10 + Math.random() * 20;
+                  const randomX = -60 + Math.random() * 20;
+                  const randomY = -60 + Math.random() * 20;
+                  return `translate(${randomX}%, ${randomY}%) rotate(${randomRotate}deg) scale(${randomScale}) skew(${randomSkew}deg)`;
             }
 
             function triggerWaveAnimation() {
-                  const newWave = waveAnimation.cloneNode(true);
-                  waveAnimation.parentNode.replaceChild(newWave, waveAnimation);
+                  waveContainer.classList.remove('active');
+                  void waveContainer.offsetWidth;
+
+                  document.querySelectorAll('.wave').forEach(wave => {
+                        wave.style.transform = getRandomTransform();
+                  });
+
+                  waveContainer.classList.add('active');
+
+                  setTimeout(() => {
+                        waveContainer.classList.remove('active');
+                  }, 2000);
             }
 
-            // Función para cambiar la frase con una animación suave
-            function cambiarFrase() {
+            function mostrarSiguienteFrase() {
                   if (frases.length === 0) return;
 
-                  // Desvanecer
                   razonDiv.style.opacity = '0';
                   razonDiv.style.transform = 'translateY(20px)';
 
                   setTimeout(() => {
-                        // Actualizar texto
-                        razonDiv.textContent = frases[currentIndex].texto;
-                        // Aparecer
+                        const fraseActual = frases[currentIndex];
+                        razonDiv.textContent = fraseActual.texto;
                         razonDiv.style.opacity = '1';
                         razonDiv.style.transform = 'translateY(0)';
 
-                        // Actualizar índice
+                        // Calcular el tiempo para la siguiente frase
                         currentIndex = (currentIndex + 1) % frases.length;
+                        const siguienteFrase = frases[currentIndex];
+                        const tiempoEspera = calcularTiempoLectura(fraseActual.texto);
 
-                        // Calcular el próximo intervalo basado en la longitud de la siguiente frase
-                        const proximaFrase = frases[currentIndex];
-                        const nuevoIntervalo = calcularTiempoLectura(proximaFrase.texto);
-
-                        // Limpiar el intervalo anterior y establecer uno nuevo
-                        clearInterval(intervalId);
-                        intervalId = setTimeout(cambiarFrase, nuevoIntervalo);
+                        // Programar la siguiente frase
+                        clearTimeout(timeoutId);
+                        timeoutId = setTimeout(mostrarSiguienteFrase, tiempoEspera);
                   }, 500);
             }
 
@@ -184,22 +326,23 @@
                               razonDiv.textContent = frases[0].texto;
                               // Iniciar el ciclo con el tiempo calculado para la primera frase
                               const tiempoInicial = calcularTiempoLectura(frases[0].texto);
-                              intervalId = setTimeout(cambiarFrase, tiempoInicial);
+                              timeoutId = setTimeout(mostrarSiguienteFrase, tiempoInicial);
                         }
                   });
 
             // Escuchar nuevas frases
             socket.on('nueva_frase', (frase) => {
                   frases.unshift(frase);
-                  // Mostrar inmediatamente la nueva frase
                   currentIndex = 0;
-                  // Limpiar el intervalo anterior
-                  clearInterval(intervalId);
-                  cambiarFrase();
-                  // Establecer nuevo intervalo basado en la longitud de la frase
-                  const nuevoIntervalo = calcularTiempoLectura(frase.texto);
-                  intervalId = setTimeout(cambiarFrase, nuevoIntervalo);
+                  clearTimeout(timeoutId);
+
+                  // Mostrar la nueva frase inmediatamente
+                  razonDiv.textContent = frase.texto;
                   triggerWaveAnimation();
+
+                  // Programar la siguiente frase con el tiempo calculado
+                  const tiempoEspera = calcularTiempoLectura(frase.texto);
+                  timeoutId = setTimeout(mostrarSiguienteFrase, tiempoEspera);
             });
       </script>
 </body>
