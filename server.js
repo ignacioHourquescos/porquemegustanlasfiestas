@@ -7,43 +7,6 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-<<<<<<< HEAD
-// Usar /tmp en producción (Render) o data/ en desarrollo
-const FRASES_FILE =
-	process.env.NODE_ENV === "production"
-		? "/tmp/frases.json"
-		: path.join(__dirname, "data", "frases.json");
-
-// Asegurarse de que el archivo y el directorio existan
-async function initializeStorage() {
-	try {
-		if (process.env.NODE_ENV === "production") {
-			// En producción, solo necesitamos crear el archivo en /tmp
-			await fs.writeFile(FRASES_FILE, JSON.stringify({ frases: [] }), "utf8");
-		} else {
-			// En desarrollo, asegurarse de que exista el directorio data/
-			const dataDir = path.join(__dirname, "data");
-			try {
-				await fs.access(dataDir);
-			} catch {
-				await fs.mkdir(dataDir);
-			}
-			// Crear el archivo si no existe
-			try {
-				await fs.access(FRASES_FILE);
-			} catch {
-				await fs.writeFile(FRASES_FILE, JSON.stringify({ frases: [] }), "utf8");
-			}
-		}
-		console.log("Almacenamiento inicializado correctamente");
-	} catch (error) {
-		console.error("Error al inicializar el almacenamiento:", error);
-	}
-}
-
-// Inicializar almacenamiento al arrancar
-initializeStorage();
-=======
 // Configuración de Firebase Admin
 const serviceAccount = {
 	type: "service_account",
@@ -70,7 +33,6 @@ admin.initializeApp({
 
 const db = admin.firestore();
 const frasesCollection = db.collection("frases");
->>>>>>> local-working-ok
 
 // Middleware para parsear JSON
 app.use(express.json());
