@@ -1,32 +1,60 @@
 const express = require("express");
 const { Server } = require("socket.io");
 const http = require("http");
-const { v4: uuidv4 } = require("uuid");
-const fs = require("fs").promises;
-const path = require("path");
+const admin = require("firebase-admin");
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server);
 
-const FRASES_FILE = path.join(__dirname, "data", "frases.json");
+// Configuración de Firebase Admin
+const serviceAccount = {
+	type: "service_account",
+	project_id: "siempre-me-gustaron",
+	private_key_id: "54729390a188028367f740b197d1fe32a191fe82",
+	private_key:
+		"-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQDlsKDny3UROaMS\nUUBl/0VBxiatfvCMDnAs1RG6eUp2G5a/QEGa2oCn65glkgtgz6dzGNO9ko9xFp/m\nI3ZiEWeBcCH+lufcmkmRIw/NqJ+MHA1zXr+/VgcuE1lbwY6RDAys0YPR1Z/RbaPG\nFExQ60oElI8xXgIlKQKugrdXDFA4rauHNxH9BEeH2ak8mlumXK94NvlvlB8Kk9IJ\nePbGay+BDIfknHazqW85L2S5H/KW/YogQSEE0aMzlQm2X8mNwTnV/uiYxmF1hg0l\nXoC6U+/7kwaHb493onMk7DPlZ27eVtoZQ1OKRv4Y0FN++MvFeEh7afdsv9Aog11t\nTHs1zmydAgMBAAECggEADHI6Ad13Qj/wi3NOLUi8GMCTQ3b7s2cr4m4ISCW+6G/9\nxu7FL040RwUf6TdE+RG/hd/cR2s77RmYAAk/ZriBNpUcLnbAaSaOInh3KIKA5L93\nZh9F/ij7+h3vy2ZNYqQ3wpyWy0XLY3aQt5DNgtwBFobzTG5G6PsUK18nbqba6Ps7\n5mbmLepFleZxNoQ6DH/OmAusRSLueAJL0Hkah0GgKHxIIvZVbeuAgBHRU8MPzarD\nKGzsDHgxUcFCiNt1JUilOIqLJr8PmrW3HhOJSR9Z5TAs/NidUL28sos/mqB+WjEB\nJ6bykbFKhb41fSCDn+rXLM9RGErrlHcNqpI8ukv3qQKBgQD1QP2qxChgOaNa1Kq0\n8zHVV50b7oAbsH+gl6a9yWgmEp9EEHvXEmghGbzJe3OFEzr5K7m+Oe6WyNXRKjXd\nhLQxZ5KYK3iUZXwpC6X0bE2l1pKED0efZK4S72RekPNM0hKlxqU6+YMfyM2+q5zG\nPG8KZdILd1rHuJRtRCNrkZScqQKBgQDvwQ60InYdwUwomWRyJmQsOjV2ACdOj6y5\nfW7i30PHA082uij+VZYfIoGpfY0HcMvcLsmi0Fkf652EaTO1KNakintnDzuS3mIs\noqO+KOPGzHSlymHZKSK7fMZXIc4nTAUaYMZ8JNxKXnJod7x+CL3CrZcQQ8ChCUoZ\n31Bc+H/01QKBgQCyK7vdYlIezeDB7PvzJzZN0i+eCh9hflDJ30JQYFBcUG0J6pu9\nPG8PlP4Uta3PwI+4Uy7GZpnRSygio3Kscmrh9WeHSxV3YV7ZBtBSiJfEYeThMaSL\nxH293dJh7RYD+h13958z/+5lmeD2ov/q+B6HRD9a+yOlMpAJ7VV6ITIAuQKBgFIT\n4ZjBg3ZESnJLsRtzETAi7VJsUwiOHy+RRXjdvjJPa7rsmEQZwL7/7Su9E57Mer3y\nNo1KjnhjDRXbfhwy0uiZkA2EJXzuLOXi9/ONxAy2yehIFJ9necB9wtjpdc32NHkH\nUGwHonLDSp+A/kKXc39GNkUXLMb0iy24SabKW+PRAoGAXBVWUCeSHvpVEux6wIXH\nQkKQomFcdnv1Gxz53cfTGtMbW6U5yDkR09oTCwwaGni4Os6x10fFQUxnVnIqkjTW\n4F8Bp2tVxmTkPRg7X8tB4UH5IuMqFdDMNe3Ht4WFtqo1EhjXMpHttiD4iffcC5eq\ngsuY42ZySdTxJreIyCYerAs=\n-----END PRIVATE KEY-----\n",
+	client_email:
+		"firebase-adminsdk-fbsvc@siempre-me-gustaron.iam.gserviceaccount.com",
+	client_id: "102550021122966038688",
+	auth_uri: "https://accounts.google.com/o/oauth2/auth",
+	token_uri: "https://oauth2.googleapis.com/token",
+	auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
+	client_x509_cert_url:
+		"https://www.googleapis.com/robot/v1/metadata/x509/firebase-adminsdk-fbsvc%40siempre-me-gustaron.iam.gserviceaccount.com",
+	universe_domain: "googleapis.com",
+};
+
+// Inicializar Firebase Admin
+admin.initializeApp({
+	credential: admin.credential.cert(serviceAccount),
+	storageBucket: "siempre-me-gustaron.firebasestorage.app",
+});
+
+const db = admin.firestore();
+const frasesCollection = db.collection("frases");
 
 // Middleware para parsear JSON
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Funciones auxiliares para manejar el archivo JSON
+// Funciones auxiliares para manejar Firestore
 async function readFrases() {
 	try {
-		const data = await fs.readFile(FRASES_FILE, "utf8");
-		return JSON.parse(data);
+		const snapshot = await frasesCollection.orderBy("timestamp", "desc").get();
+		const frases = [];
+		snapshot.forEach((doc) => {
+			frases.push({
+				id: doc.id,
+				...doc.data(),
+				timestamp: doc.data().timestamp.toDate().toISOString(),
+			});
+		});
+		return { frases };
 	} catch (error) {
+		console.error("Error al leer frases:", error);
 		return { frases: [] };
 	}
-}
-
-async function writeFrases(frases) {
-	await fs.writeFile(FRASES_FILE, JSON.stringify(frases, null, 2), "utf8");
 }
 
 // Ruta principal - Formulario de entrada
@@ -561,6 +589,7 @@ app.get("/frases", async (req, res) => {
 		const data = await readFrases();
 		res.json(data);
 	} catch (error) {
+		console.error("Error al leer frases:", error);
 		res.status(500).json({ error: "Error al leer las frases" });
 	}
 });
@@ -574,18 +603,21 @@ app.post("/frase", async (req, res) => {
 		}
 
 		const nuevaFrase = {
-			id: uuidv4(),
 			texto,
-			timestamp: new Date().toISOString(),
+			timestamp: admin.firestore.Timestamp.now(),
 		};
 
-		const data = await readFrases();
-		data.frases.unshift(nuevaFrase);
-		await writeFrases(data);
+		const docRef = await frasesCollection.add(nuevaFrase);
+		const fraseCompleta = {
+			id: docRef.id,
+			...nuevaFrase,
+			timestamp: nuevaFrase.timestamp.toDate().toISOString(),
+		};
 
-		io.emit("nueva_frase", nuevaFrase);
-		res.status(201).json(nuevaFrase);
+		io.emit("nueva_frase", fraseCompleta);
+		res.status(201).json(fraseCompleta);
 	} catch (error) {
+		console.error("Error al guardar frase:", error);
 		res.status(500).json({ error: "Error al guardar la frase" });
 	}
 });
@@ -599,18 +631,25 @@ app.put("/frase/:id", async (req, res) => {
 			return res.status(400).json({ error: "Texto inválido" });
 		}
 
-		const data = await readFrases();
-		const fraseIndex = data.frases.findIndex((f) => f.id === id);
+		const fraseRef = frasesCollection.doc(id);
+		const doc = await fraseRef.get();
 
-		if (fraseIndex === -1) {
+		if (!doc.exists) {
 			return res.status(404).json({ error: "Frase no encontrada" });
 		}
 
-		data.frases[fraseIndex].texto = texto;
-		await writeFrases(data);
+		await fraseRef.update({ texto });
 
-		res.json(data.frases[fraseIndex]);
+		const updatedDoc = await fraseRef.get();
+		const fraseActualizada = {
+			id: updatedDoc.id,
+			...updatedDoc.data(),
+			timestamp: updatedDoc.data().timestamp.toDate().toISOString(),
+		};
+
+		res.json(fraseActualizada);
 	} catch (error) {
+		console.error("Error al actualizar frase:", error);
 		res.status(500).json({ error: "Error al actualizar la frase" });
 	}
 });
@@ -618,24 +657,23 @@ app.put("/frase/:id", async (req, res) => {
 app.delete("/frase/:id", async (req, res) => {
 	try {
 		const { id } = req.params;
-		const data = await readFrases();
+		const fraseRef = frasesCollection.doc(id);
+		const doc = await fraseRef.get();
 
-		const fraseIndex = data.frases.findIndex((f) => f.id === id);
-		if (fraseIndex === -1) {
+		if (!doc.exists) {
 			return res.status(404).json({ error: "Frase no encontrada" });
 		}
 
-		data.frases.splice(fraseIndex, 1);
-		await writeFrases(data);
-
+		await fraseRef.delete();
 		res.status(204).send();
 	} catch (error) {
+		console.error("Error al eliminar frase:", error);
 		res.status(500).json({ error: "Error al eliminar la frase" });
 	}
 });
 
 // Iniciar el servidor
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 server.listen(PORT, () => {
 	console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
