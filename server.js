@@ -2,6 +2,7 @@ const express = require("express");
 const { Server } = require("socket.io");
 const http = require("http");
 const admin = require("firebase-admin");
+const path = require("path");
 
 const app = express();
 const server = http.createServer(app);
@@ -38,6 +39,9 @@ const frasesCollection = db.collection("frases");
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Servir archivos estáticos desde el directorio 'views'
+app.use(express.static("views"));
+
 // Funciones auxiliares para manejar Firestore
 async function readFrases() {
 	try {
@@ -65,7 +69,7 @@ app.get("/", (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>¿Por qué te gustan las fiestas?</title>
+      <title>Me gustan las fiestas porque</title>
       <style>
         * {
           margin: 0;
@@ -217,149 +221,7 @@ app.get("/", (req, res) => {
 
 // Ruta de visualización en tiempo real
 app.get("/live", (req, res) => {
-	const html = `
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-      <meta charset="UTF-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Frases en Vivo</title>
-      <style>
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
-        
-        body {
-          min-height: 100vh;
-          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-          padding: 40px 20px;
-        }
-        
-        .container {
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-        
-        h1 {
-          color: #2d3748;
-          margin-bottom: 40px;
-          text-align: center;
-          font-size: 2.5rem;
-        }
-        
-        #frases-container {
-          display: grid;
-          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-          gap: 20px;
-          padding: 20px;
-        }
-        
-        .frase-card {
-          background: white;
-          padding: 25px;
-          border-radius: 12px;
-          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-          transition: transform 0.3s ease;
-          opacity: 0;
-          animation: fadeIn 0.5s ease forwards;
-        }
-        
-        .frase-card:hover {
-          transform: translateY(-5px);
-        }
-        
-        .frase-texto {
-          color: #2d3748;
-          font-size: 1.1rem;
-          line-height: 1.6;
-          margin-bottom: 15px;
-        }
-        
-        .frase-fecha {
-          color: #718096;
-          font-size: 0.9rem;
-        }
-        
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        
-        #contador {
-          text-align: center;
-          margin-bottom: 30px;
-          color: #4a5568;
-          font-size: 1.2rem;
-        }
-      </style>
-      <script src="/socket.io/socket.io.js"></script>
-    </head>
-    <body>
-      <div class="container">
-        <h1>Frases en Vivo</h1>
-        <div id="contador">Cargando frases...</div>
-        <div id="frases-container"></div>
-      </div>
-      
-      <script>
-        const socket = io();
-        const frasesContainer = document.getElementById('frases-container');
-        const contadorDiv = document.getElementById('contador');
-        
-        function formatDate(dateString) {
-          return new Date(dateString).toLocaleString('es-ES', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-          });
-        }
-        
-        function createFraseCard(frase) {
-          const card = document.createElement('div');
-          card.className = 'frase-card';
-          card.innerHTML = \`
-            <p class="frase-texto">\${frase.texto}</p>
-            <p class="frase-fecha">\${formatDate(frase.timestamp)}</p>
-          \`;
-          return card;
-        }
-        
-        function updateContador(count) {
-          contadorDiv.textContent = \`Total de frases: \${count}\`;
-        }
-        
-        // Cargar frases iniciales
-        fetch('/frases')
-          .then(response => response.json())
-          .then(data => {
-            data.frases.forEach(frase => {
-              frasesContainer.appendChild(createFraseCard(frase));
-            });
-            updateContador(data.frases.length);
-          });
-        
-        // Escuchar nuevas frases
-        socket.on('nueva_frase', (frase) => {
-          const card = createFraseCard(frase);
-          frasesContainer.insertBefore(card, frasesContainer.firstChild);
-          updateContador(frasesContainer.children.length);
-        });
-      </script>
-    </body>
-    </html>
-  `;
-	res.send(html);
+	res.sendFile(path.join(__dirname, "views", "live.html"));
 });
 
 // Ruta de administración

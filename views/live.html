@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Me gustan las fiestas porque</title>
+      <style>
+            * {
+                  margin: 0;
+                  padding: 0;
+                  box-sizing: border-box;
+                  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            }
+
+            body {
+                  min-height: 100vh;
+                  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                  padding: 40px 20px;
+                  overflow: hidden;
+                  position: relative;
+            }
+
+            .wave-animation {
+                  position: fixed;
+                  top: 0;
+                  left: 0;
+                  width: 100%;
+                  height: 100%;
+                  pointer-events: none;
+                  z-index: 1;
+                  opacity: 0;
+                  background: linear-gradient(45deg,
+                              #FFD700,
+                              /* Amarillo brillante */
+                              #FF1493,
+                              /* Rosa fuerte */
+                              #4B0082,
+                              /* Índigo */
+                              #9370DB,
+                              /* Púrpura medio */
+                              #32CD32
+                              /* Verde lima */
+                        );
+                  background-size: 400% 400%;
+                  animation: waveColors 3s ease-in-out forwards;
+                  mix-blend-mode: overlay;
+            }
+
+            @keyframes waveColors {
+                  0% {
+                        opacity: 0;
+                        background-position: 0% 50%;
+                  }
+
+                  20% {
+                        opacity: 0.7;
+                  }
+
+                  80% {
+                        opacity: 0.7;
+                        background-position: 100% 50%;
+                  }
+
+                  100% {
+                        opacity: 0;
+                        background-position: 0% 50%;
+                  }
+            }
+
+            .container {
+                  position: fixed;
+                  top: 50%;
+                  left: 50%;
+                  transform: translate(-50%, -50%);
+                  text-align: center;
+                  width: 90%;
+                  max-width: 1200px;
+                  z-index: 2;
+            }
+
+            .frase {
+                  font-size: 3rem;
+                  line-height: 1.2;
+                  color: #2d3748;
+                  white-space: nowrap;
+                  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .razon {
+                  font-size: 3rem;
+                  line-height: 1.2;
+                  color: #f56565;
+                  display: block;
+                  margin-top: 20px;
+                  transition: all 0.5s ease-in-out;
+                  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            @media (max-width: 768px) {
+
+                  .frase,
+                  .razon {
+                        font-size: 2rem;
+                  }
+            }
+
+            @media (max-width: 480px) {
+
+                  .frase,
+                  .razon {
+                        font-size: 1.5rem;
+                  }
+
+                  .container {
+                        width: 95%;
+                  }
+            }
+      </style>
+      <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+      <div class="wave-animation"></div>
+      <div class="container">
+            <h1 class="frase">Me gustan las fiestas por que</h1>
+            <div class="razon">...</div>
+      </div>
+
+      <script>
+            const socket = io();
+            const razonDiv = document.querySelector('.razon');
+            const waveAnimation = document.querySelector('.wave-animation');
+            let frases = [];
+            let currentIndex = 0;
+            let intervalId = null; // Para poder limpiar el intervalo anterior
+
+            // Función para calcular el tiempo basado en la longitud del texto
+            function calcularTiempoLectura(texto) {
+                  const TIEMPO_BASE = 2000; // 2 segundos mínimo
+                  const TIEMPO_POR_CARACTER = 100; // 100ms por caracter
+                  return TIEMPO_BASE + (texto.length * TIEMPO_POR_CARACTER);
+            }
+
+            function triggerWaveAnimation() {
+                  const newWave = waveAnimation.cloneNode(true);
+                  waveAnimation.parentNode.replaceChild(newWave, waveAnimation);
+            }
+
+            // Función para cambiar la frase con una animación suave
+            function cambiarFrase() {
+                  if (frases.length === 0) return;
+
+                  // Desvanecer
+                  razonDiv.style.opacity = '0';
+                  razonDiv.style.transform = 'translateY(20px)';
+
+                  setTimeout(() => {
+                        // Actualizar texto
+                        razonDiv.textContent = frases[currentIndex].texto;
+                        // Aparecer
+                        razonDiv.style.opacity = '1';
+                        razonDiv.style.transform = 'translateY(0)';
+
+                        // Actualizar índice
+                        currentIndex = (currentIndex + 1) % frases.length;
+
+                        // Calcular el próximo intervalo basado en la longitud de la siguiente frase
+                        const proximaFrase = frases[currentIndex];
+                        const nuevoIntervalo = calcularTiempoLectura(proximaFrase.texto);
+
+                        // Limpiar el intervalo anterior y establecer uno nuevo
+                        clearInterval(intervalId);
+                        intervalId = setTimeout(cambiarFrase, nuevoIntervalo);
+                  }, 500);
+            }
+
+            // Cargar frases iniciales
+            fetch('/frases')
+                  .then(response => response.json())
+                  .then(data => {
+                        frases = data.frases;
+                        if (frases.length > 0) {
+                              razonDiv.textContent = frases[0].texto;
+                              // Iniciar el ciclo con el tiempo calculado para la primera frase
+                              const tiempoInicial = calcularTiempoLectura(frases[0].texto);
+                              intervalId = setTimeout(cambiarFrase, tiempoInicial);
+                        }
+                  });
+
+            // Escuchar nuevas frases
+            socket.on('nueva_frase', (frase) => {
+                  frases.unshift(frase);
+                  // Mostrar inmediatamente la nueva frase
+                  currentIndex = 0;
+                  // Limpiar el intervalo anterior
+                  clearInterval(intervalId);
+                  cambiarFrase();
+                  // Establecer nuevo intervalo basado en la longitud de la frase
+                  const nuevoIntervalo = calcularTiempoLectura(frase.texto);
+                  intervalId = setTimeout(cambiarFrase, nuevoIntervalo);
+                  triggerWaveAnimation();
+            });
+      </script>
+</body>
+
+</html>
