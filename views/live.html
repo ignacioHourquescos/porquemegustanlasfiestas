@@ -8,17 +8,21 @@
       <link rel="preconnect" href="https://fonts.googleapis.com">
       <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
       <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;700;900&display=swap"
+            rel="stylesheet">
       <style>
             * {
                   margin: 0;
                   padding: 0;
                   box-sizing: border-box;
-                  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+                  font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             }
 
             body {
                   min-height: 100vh;
-                  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+                  background: radial-gradient(1200px 800px at 10% 10%, #0a48ff 0%, rgba(10, 72, 255, 0.6) 35%, transparent 60%),
+                        radial-gradient(900px 700px at 90% 20%, #0024a3 0%, rgba(0, 36, 163, 0.5) 40%, transparent 65%),
+                        linear-gradient(135deg, #03154a 0%, #072d7a 50%, #0a3ea3 100%);
                   padding: 40px 20px;
                   overflow: hidden;
                   position: relative;
@@ -47,19 +51,19 @@
                   width: 200%;
                   height: 200%;
                   background: linear-gradient(45deg,
-                              #FFD700,
-                              /* Amarillo */
-                              #FF1493,
-                              /* Rosa */
-                              #4B0082,
-                              /* Índigo */
-                              #9370DB,
-                              /* Púrpura */
-                              #90EE90
-                              /* Verde claro */
+                              #1b51ff,
+                              /* Azul eléctrico */
+                              #2b6bff,
+                              /* Azul vivo */
+                              #0a48ff,
+                              /* Azul intenso */
+                              #6ea3ff,
+                              /* Azul claro */
+                              #0f1b86
+                              /* Azul profundo */
                         );
-                  opacity: 0.4;
-                  mix-blend-mode: soft-light;
+                  opacity: 0.35;
+                  mix-blend-mode: screen;
                   transform-origin: center;
             }
 
@@ -174,63 +178,131 @@
                   top: 50%;
                   left: 50%;
                   transform: translate(-50%, -50%);
-                  text-align: center;
+                  text-align: left;
                   width: 90%;
-                  max-width: 1200px;
+                  max-width: 1400px;
                   z-index: 2;
             }
 
             .frase {
-                  font-family: 'Syne Mono', monospace;
-                  font-size: 3rem;
+                  font-family: 'Space Grotesk', sans-serif;
+                  font-size: 1.25rem;
                   line-height: 1.2;
-                  color: #000000;
-                  white-space: nowrap;
-                  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-                  letter-spacing: 0.02em;
+                  color: #a6c0ff;
+                  white-space: normal;
+                  text-shadow: 0 0 0 transparent;
+                  letter-spacing: 0.12em;
+                  text-transform: uppercase;
             }
 
             .razon {
-                  font-family: 'Syne Mono', monospace;
-                  font-size: 3rem;
-                  line-height: 1.2;
-                  color: #a513d6;
+                  font-family: 'Space Grotesk', sans-serif;
+                  font-weight: 800;
+                  font-size: clamp(1.4rem, 7.5vw, 10rem);
+                  line-height: 0.9;
+                  color: #ffffff;
                   display: block;
-                  margin-top: 20px;
+                  margin-top: 24px;
                   transition: all 0.5s ease-in-out;
-                  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+                  text-shadow: 0 10px 24px rgba(0, 32, 122, 0.45);
+                  letter-spacing: 0.02em;
+                  text-transform: uppercase;
+                  max-width: 90vw;
             }
 
             @media (max-width: 768px) {
 
                   .frase {
-                        font-size: 2.5rem;
+                        font-size: 1rem;
                   }
 
                   .razon {
-                        font-size: 2rem;
+                        font-size: clamp(1.35rem, 8.5vw, 4.5rem);
                   }
             }
 
             @media (max-width: 480px) {
 
                   .frase {
-                        font-size: 2rem;
+                        font-size: 0.95rem;
                   }
 
                   .razon {
-                        font-size: 1.5rem;
+                        font-size: clamp(1.1rem, 9.5vw, 2.8rem);
                   }
 
                   .container {
                         width: 95%;
                   }
             }
+
+            /* Marca: badge tipo "FREEquence" */
+            .brand {
+                  position: fixed;
+                  top: 32px;
+                  left: 32px;
+                  z-index: 3;
+                  color: #dce6ff;
+                  text-shadow: none;
+            }
+
+            .brand-badge {
+                  display: inline-flex;
+                  align-items: stretch;
+                  gap: 0;
+                  border: 2px solid rgba(255, 255, 255, 0.8);
+                  border-radius: 16px;
+                  overflow: hidden;
+                  backdrop-filter: blur(6px);
+                  background: rgba(8, 22, 84, 0.25);
+            }
+
+            .brand-name {
+                  font-family: 'Space Grotesk', sans-serif;
+                  font-weight: 700;
+                  letter-spacing: 0.06em;
+                  padding: 10px 16px;
+                  font-size: 18px;
+                  color: #ffffff;
+                  display: inline-flex;
+                  align-items: center;
+            }
+
+            .brand-seg {
+                  display: inline-flex;
+                  align-items: center;
+                  justify-content: center;
+                  padding: 8px 12px;
+                  border-left: 2px solid rgba(255, 255, 255, 0.8);
+                  background: rgba(255, 255, 255, 0.06);
+            }
+
+            .brand-tagline {
+                  font-family: 'Syne Mono', monospace;
+                  font-size: 12px;
+                  margin-top: 8px;
+                  opacity: 0.9;
+                  letter-spacing: 0.06em;
+            }
       </style>
       <script src="/socket.io/socket.io.js"></script>
 </head>
 
 <body>
+      <div class="brand">
+            <div class="brand-badge">
+                  <span class="brand-name">FREEquence</span>
+                  <span class="brand-seg" aria-hidden="true">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <circle cx="12" cy="12" r="9" stroke="white" stroke-width="2" />
+                              <circle cx="12" cy="12" r="2" fill="white" />
+                              <path d="M12 3v6M21 12h-6M12 21v-6M3 12h6M17.657 6.343l-4.243 4.243M17.657 17.657l-4.243-4.243M6.343 17.657l4.243-4.243M6.343 6.343l4.243 4.243"
+                                    stroke="white" stroke-width="2" stroke-linecap="round" />
+                        </svg>
+                  </span>
+            </div>
+
+      </div>
       <div class="wave-container">
             <div class="wave wave1"></div>
             <div class="wave wave2"></div>
@@ -238,7 +310,7 @@
             <div class="wave wave4"></div>
       </div>
       <div class="container">
-            <h1 class="frase">Me gustan las fiestas por que</h1>
+            <h1 class="frase">¿Como elevas elevas tu frecuencia?</h1>
             <div class="razon">...</div>
       </div>
 
