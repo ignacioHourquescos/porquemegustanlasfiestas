@@ -188,7 +188,7 @@ app.get("/", (req, res) => {
             name="texto" 
             placeholder="Comparte tu razón..."
             required
-            minlength="10"
+            minlength="3"
             maxlength="500"
           ></textarea>
           <button type="submit">Enviar</button>
@@ -481,7 +481,7 @@ app.post("/frase", async (req, res) => {
 	try {
 		const { texto } = req.body;
 
-		if (!texto || texto.length < 10 || texto.length > 500) {
+		if (!texto || texto.length < 3 || texto.length > 500) {
 			return res.status(400).json({ error: "Texto inválido" });
 		}
 
@@ -510,7 +510,7 @@ app.put("/frase/:id", async (req, res) => {
 		const { id } = req.params;
 		const { texto } = req.body;
 
-		if (!texto || texto.length < 10 || texto.length > 500) {
+		if (!texto || texto.length < 3 || texto.length > 500) {
 			return res.status(400).json({ error: "Texto inválido" });
 		}
 

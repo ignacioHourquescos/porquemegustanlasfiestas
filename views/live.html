@@ -186,9 +186,11 @@
 
             .frase {
                   font-family: 'Space Grotesk', sans-serif;
-                  font-size: 1.25rem;
+                  font-size: 3rem;
                   line-height: 1.2;
                   color: #a6c0ff;
+                  opacity: 0.4;
+                  ;
                   white-space: normal;
                   text-shadow: 0 0 0 transparent;
                   letter-spacing: 0.12em;
@@ -198,7 +200,7 @@
             .razon {
                   font-family: 'Space Grotesk', sans-serif;
                   font-weight: 800;
-                  font-size: clamp(1.4rem, 7.5vw, 10rem);
+                  font-size: clamp(1.2rem, 7.5vw, 7rem);
                   line-height: 0.9;
                   color: #ffffff;
                   display: block;
@@ -217,7 +219,7 @@
                   }
 
                   .razon {
-                        font-size: clamp(1.35rem, 8.5vw, 4.5rem);
+                        font-size: clamp(1.35rem, 8.5vw, 4rem);
                   }
             }
 
@@ -240,10 +242,11 @@
             .brand {
                   position: fixed;
                   top: 32px;
-                  left: 32px;
+                  left: 60px;
                   z-index: 3;
                   color: #dce6ff;
                   text-shadow: none;
+
             }
 
             .brand-badge {
@@ -271,6 +274,7 @@
             .brand-seg {
                   display: inline-flex;
                   align-items: center;
+                  margin-left: 1rem;
                   justify-content: center;
                   padding: 8px 12px;
                   border-left: 2px solid rgba(255, 255, 255, 0.8);
@@ -290,17 +294,28 @@
 
 <body>
       <div class="brand">
-            <div class="brand-badge">
-                  <span class="brand-name">FREEquence</span>
-                  <span class="brand-seg" aria-hidden="true">
-                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                              <circle cx="12" cy="12" r="9" stroke="white" stroke-width="2" />
-                              <circle cx="12" cy="12" r="2" fill="white" />
-                              <path d="M12 3v6M21 12h-6M12 21v-6M3 12h6M17.657 6.343l-4.243 4.243M17.657 17.657l-4.243-4.243M6.343 17.657l4.243-4.243M6.343 6.343l4.243 4.243"
-                                    stroke="white" stroke-width="2" stroke-linecap="round" />
-                        </svg>
-                  </span>
-            </div>
+
+
+            <span class="brand-seg" aria-hidden="true">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="9" stroke="white" stroke-width="2" />
+                        <circle cx="12" cy="12" r="2" fill="white" />
+                        <path d="M12 3v6M21 12h-6M12 21v-6M3 12h6M17.657 6.343l-4.243 4.243M17.657 17.657l-4.243-4.243M6.343 17.657l4.243-4.243M6.343 6.343l4.243 4.243"
+                              stroke="white" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="9" stroke="white" stroke-width="2" />
+                        <circle cx="12" cy="12" r="2" fill="white" />
+                        <path d="M12 3v6M21 12h-6M12 21v-6M3 12h6M17.657 6.343l-4.243 4.243M17.657 17.657l-4.243-4.243M6.343 17.657l4.243-4.243M6.343 6.343l4.243 4.243"
+                              stroke="white" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="12" cy="12" r="9" stroke="white" stroke-width="2" />
+                        <circle cx="12" cy="12" r="2" fill="white" />
+                        <path d="M12 3v6M21 12h-6M12 21v-6M3 12h6M17.657 6.343l-4.243 4.243M17.657 17.657l-4.243-4.243M6.343 17.657l4.243-4.243M6.343 6.343l4.243 4.243"
+                              stroke="white" stroke-width="2" stroke-linecap="round" />
+                  </svg>
+            </span>
 
       </div>
       <div class="wave-container">
@@ -321,6 +336,7 @@
             let frases = [];
             let currentIndex = 0;
             let timeoutId = null;
+            let incomingTimeoutId = null;
 
             // Función para calcular el tiempo de lectura basado en la longitud del texto
             function calcularTiempoLectura(texto) {
@@ -408,13 +424,19 @@
                   currentIndex = 0;
                   clearTimeout(timeoutId);
 
-                  // Mostrar la nueva frase inmediatamente
-                  razonDiv.textContent = frase.texto;
-                  triggerWaveAnimation();
+                  if (incomingTimeoutId) {
+                        clearTimeout(incomingTimeoutId);
+                  }
 
-                  // Programar la siguiente frase con el tiempo calculado
-                  const tiempoEspera = calcularTiempoLectura(frase.texto);
-                  timeoutId = setTimeout(mostrarSiguienteFrase, tiempoEspera);
+                  // Mostrar la nueva frase con un delay de 1 segundo
+                  incomingTimeoutId = setTimeout(() => {
+                        razonDiv.textContent = frase.texto;
+                        triggerWaveAnimation();
+
+                        // Programar la siguiente frase con el tiempo calculado
+                        const tiempoEspera = calcularTiempoLectura(frase.texto);
+                        timeoutId = setTimeout(mostrarSiguienteFrase, tiempoEspera);
+                  }, 1000);
             });
       </script>
 </body>
