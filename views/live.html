@@ -210,6 +210,10 @@
                   letter-spacing: 0.02em;
                   text-transform: uppercase;
                   max-width: 90vw;
+                  /* Forzar salto de línea en palabras muy largas */
+                  overflow-wrap: anywhere;
+                  word-break: break-word;
+                  hyphens: auto;
             }
 
             @media (max-width: 768px) {
@@ -288,6 +292,48 @@
                   opacity: 0.9;
                   letter-spacing: 0.06em;
             }
+
+            /* Vibración sutil por letra */
+            .glyph {
+                  display: inline-block;
+            }
+
+            .char {
+                  display: inline-block;
+                  will-change: transform;
+                  transform-origin: 50% 50%;
+                  animation: subtle-jitter var(--dur, 0.3s) linear infinite;
+            }
+
+            .frase .char {
+                  opacity: 0.7;
+            }
+
+            @keyframes subtle-jitter {
+                  0% {
+                        transform: translate(0, 0) rotate(0deg);
+                  }
+
+                  20% {
+                        transform: translate(var(--amp, 1px), calc(var(--amp, 1px) * -0.5)) rotate(var(--rot, 0.2deg));
+                  }
+
+                  40% {
+                        transform: translate(calc(var(--amp, 1px) * -0.6), calc(var(--amp, 1px) * 0.9)) rotate(calc(var(--rot, 0.2deg) * -1));
+                  }
+
+                  60% {
+                        transform: translate(calc(var(--amp, 1px) * 0.5), calc(var(--amp, 1px) * 0.5)) rotate(calc(var(--rot, 0.2deg) * 0.6));
+                  }
+
+                  80% {
+                        transform: translate(calc(var(--amp, 1px) * -0.4), calc(var(--amp, 1px) * -0.4)) rotate(calc(var(--rot, 0.2deg) * -0.4));
+                  }
+
+                  100% {
+                        transform: translate(0, 0) rotate(0deg);
+                  }
+            }
       </style>
       <script src="/socket.io/socket.io.js"></script>
 </head>
@@ -325,13 +371,14 @@
             <div class="wave wave4"></div>
       </div>
       <div class="container">
-            <h1 class="frase">¿Como elevas elevas tu frecuencia?</h1>
+            <h1 class="frase">¿Como elevas tu frecuencia?</h1>
             <div class="razon">...</div>
       </div>
 
       <script>
             const socket = io();
             const razonDiv = document.querySelector('.razon');
+            const fraseEl = document.querySelector('.frase');
             const waveContainer = document.querySelector('.wave-container');
             let frases = [];
             let currentIndex = 0;
@@ -367,6 +414,67 @@
                   return `translate(${randomX}%, ${randomY}%) rotate(${randomRotate}deg) scale(${randomScale}) skew(${randomSkew}deg)`;
             }
 
+            // Normalizar carácter a su base sin acentos
+            function normalizeBase(ch) {
+                  return ch.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+            }
+
+            function isAnyVowel(ch) {
+                  const base = normalizeBase(ch);
+                  return 'aeiou'.includes(base);
+            }
+
+            function isTargetVowel(ch, target) {
+                  return normalizeBase(ch) === target;
+            }
+
+            function pickVowelForText(text) {
+                  const present = new Set();
+                  for (const ch of text) {
+                        if (isAnyVowel(ch)) present.add(normalizeBase(ch));
+                  }
+                  if (present.size === 0) return 'e';
+                  const arr = Array.from(present);
+                  return arr[Math.floor(Math.random() * arr.length)];
+            }
+
+            // Envolver texto en spans por carácter y aplicar variables CSS solo a la vocal elegida
+            function wrapTextWithCharSpans(element, text, options = {}) {
+                  const {
+                        ampMin = 0.8,
+                        ampMax = 1.8,
+                        rotMin = 0.1,
+                        rotMax = 0.35,
+                        durMin = 0.16,
+                        durMax = 0.36,
+                        vowel
+                  } = options;
+
+                  element.innerHTML = '';
+                  const activeVowel = vowel ?? pickVowelForText(text);
+
+                  for (const ch of text) {
+                        if (ch === ' ') {
+                              element.appendChild(document.createTextNode(' '));
+                              continue;
+                        }
+                        const span = document.createElement('span');
+                        span.className = 'glyph';
+                        if (isTargetVowel(ch, activeVowel)) {
+                              span.classList.add('char');
+                              const amp = (ampMin + Math.random() * (ampMax - ampMin)).toFixed(2) + 'px';
+                              const rot = (rotMin + Math.random() * (rotMax - rotMin)).toFixed(2) + 'deg';
+                              const dur = (durMin + Math.random() * (durMax - durMin)).toFixed(2) + 's';
+                              span.style.setProperty('--amp', amp);
+                              span.style.setProperty('--rot', rot);
+                              span.style.setProperty('--dur', dur);
+                              span.style.animationDelay = (Math.random() * 0.2).toFixed(2) + 's';
+                        }
+                        span.textContent = ch;
+                        element.appendChild(span);
+                  }
+            }
+
             function triggerWaveAnimation() {
                   waveContainer.classList.remove('active');
                   void waveContainer.offsetWidth;
@@ -390,7 +498,8 @@
 
                   setTimeout(() => {
                         const fraseActual = frases[currentIndex];
-                        razonDiv.textContent = fraseActual.texto;
+                        const vowel = pickVowelForText(fraseActual.texto);
+                        wrapTextWithCharSpans(razonDiv, fraseActual.texto, { ampMin: 1.0, ampMax: 2.0, rotMin: 0.12, rotMax: 0.35, durMin: 0.12, durMax: 0.28, vowel });
                         razonDiv.style.opacity = '1';
                         razonDiv.style.transform = 'translateY(0)';
 
@@ -411,7 +520,8 @@
                   .then(data => {
                         frases = data.frases;
                         if (frases.length > 0) {
-                              razonDiv.textContent = frases[0].texto;
+                              const vowel = pickVowelForText(frases[0].texto);
+                              wrapTextWithCharSpans(razonDiv, frases[0].texto, { ampMin: 1.0, ampMax: 2.0, rotMin: 0.12, rotMax: 0.35, durMin: 0.12, durMax: 0.28, vowel });
                               // Iniciar el ciclo con el tiempo calculado para la primera frase
                               const tiempoInicial = calcularTiempoLectura(frases[0].texto);
                               timeoutId = setTimeout(mostrarSiguienteFrase, tiempoInicial);
@@ -430,7 +540,8 @@
 
                   // Mostrar la nueva frase con un delay de 1 segundo
                   incomingTimeoutId = setTimeout(() => {
-                        razonDiv.textContent = frase.texto;
+                        const vowel = pickVowelForText(frase.texto);
+                        wrapTextWithCharSpans(razonDiv, frase.texto, { ampMin: 1.0, ampMax: 2.0, rotMin: 0.12, rotMax: 0.35, durMin: 0.12, durMax: 0.28, vowel });
                         triggerWaveAnimation();
 
                         // Programar la siguiente frase con el tiempo calculado
@@ -438,6 +549,9 @@
                         timeoutId = setTimeout(mostrarSiguienteFrase, tiempoEspera);
                   }, 1000);
             });
+
+            // Aplicar vibración al título estático
+            wrapTextWithCharSpans(fraseEl, fraseEl.textContent, { ampMin: 0.6, ampMax: 1.4, rotMin: 0.08, rotMax: 0.25, durMin: 0.18, durMax: 0.36, vowel: pickVowelForText(fraseEl.textContent) });
       </script>
 </body>
 

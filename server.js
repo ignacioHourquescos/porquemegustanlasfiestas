@@ -69,13 +69,17 @@ app.get("/", (req, res) => {
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Me gustan las fiestas porque</title>
+      <title>¿Qué haces para elevar tu frecuencia?</title>
+      <link rel="preconnect" href="https://fonts.googleapis.com">
+      <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+      <link href="https://fonts.googleapis.com/css2?family=Syne+Mono&display=swap" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800&family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
       <style>
         * {
           margin: 0;
           padding: 0;
           box-sizing: border-box;
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+          font-family: 'Space Grotesk', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
         
         body {
@@ -83,7 +87,9 @@ app.get("/", (req, res) => {
           display: flex;
           justify-content: center;
           align-items: center;
-          background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+          background: radial-gradient(1200px 800px at 10% 10%, #0a48ff 0%, rgba(10, 72, 255, 0.6) 35%, transparent 60%),
+                     radial-gradient(900px 700px at 90% 20%, #0024a3 0%, rgba(0, 36, 163, 0.5) 40%, transparent 65%),
+                     linear-gradient(135deg, #03154a 0%, #072d7a 50%, #0a3ea3 100%);
           padding: 10px;
         }
         
@@ -97,10 +103,16 @@ app.get("/", (req, res) => {
         }
         
         h1 {
-          color: #2d3748;
+          color: #ffffff;
           margin-bottom: 15px;
-          font-size: 1.5rem;
+          font-size: 1.75rem;
           text-align: center;
+          text-transform: uppercase;
+        }
+
+        h1 .sub {
+          font-size: 0.9em;
+          display: inline-block;
         }
         
         form {
@@ -167,10 +179,12 @@ app.get("/", (req, res) => {
             min-height: 100vh;
             border-radius: 0;
             padding: 15px;
+            background: transparent; /* que se vea el fondo azul */
+            box-shadow: none;
           }
 
           h1 {
-            font-size: 1.2rem;
+            font-size: 2rem; /* un poco más grande en móvil */
             margin-bottom: 10px;
           }
 
@@ -178,22 +192,63 @@ app.get("/", (req, res) => {
             min-height: 200px;
           }
         }
+        /* Overlay de cuenta regresiva */
+        .overlay {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(10, 72, 255, 0.96);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 9999;
+        }
+
+        .overlay.show {
+          display: flex;
+        }
+
+        .overlay-content {
+          text-align: center;
+          color: #ffffff;
+        }
+
+        .countdown-number {
+          font-size: clamp(4rem, 20vw, 14rem);
+          font-weight: 800;
+          letter-spacing: 0.02em;
+        }
+
+        .countdown-text {
+          font-size: clamp(1.5rem, 6vw, 4rem);
+          font-weight: 700;
+          margin-top: 12px;
+        }
       </style>
     </head>
     <body>
       <div class="container">
-        <h1>Me gustan las fiestas por que</h1>
+        <h1>¿COMO ELEVAS TU FRECUENCIA?<br/><span class="sub" style="font-size: 20px; font-weight:200;">Algun secreto o consejo que quieras compartir que te haga sentirte bien y vibrar alto</span></h1>
         <form id="fraseForm">
           <textarea 
             name="texto" 
-            placeholder="Comparte tu razón..."
+            placeholder="Comparte tu secreto o consejo..."
             required
             minlength="3"
             maxlength="500"
           ></textarea>
-          <button type="submit">Enviar</button>
+          <button type="submit">Compartir</button>
         </form>
         <div id="message" class="message"></div>
+      </div>
+      
+      <div id="countdownOverlay" class="overlay" aria-hidden="true">
+        <div class="overlay-content">
+          <div id="countdownNumber" class="countdown-number"></div>
+          <div id="countdownText" class="countdown-text" style="display:none;">Mira a la pared</div>
+        </div>
       </div>
       
       <script>
@@ -202,11 +257,38 @@ app.get("/", (req, res) => {
         
         form.addEventListener('submit', async (e) => {
           e.preventDefault();
-          
+
           const formData = new FormData(form);
           const texto = formData.get('texto');
-          
+
+          const overlay = document.getElementById('countdownOverlay');
+          const cdNumber = document.getElementById('countdownNumber');
+          const cdText = document.getElementById('countdownText');
+          const submitBtn = form.querySelector('button[type="submit"]');
+
+          function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+          async function runCountdown() {
+            overlay.classList.add('show');
+            cdText.style.display = 'none';
+            cdNumber.style.display = 'block';
+
+            cdNumber.textContent = '3';
+            await sleep(1000);
+            cdNumber.textContent = '2';
+            await sleep(1000);
+            cdNumber.textContent = '1';
+            await sleep(1000);
+
+            cdNumber.style.display = 'none';
+            cdText.style.display = 'block';
+            await sleep(1000);
+          }
+
           try {
+            submitBtn.disabled = true;
+            await runCountdown();
+
             const response = await fetch('/frase', {
               method: 'POST',
               headers: {
@@ -214,13 +296,13 @@ app.get("/", (req, res) => {
               },
               body: JSON.stringify({ texto }),
             });
-            
+
             if (response.ok) {
               messageDiv.textContent = '¡Gracias por compartir!';
               messageDiv.className = 'message success';
               messageDiv.style.display = 'block';
               form.reset();
-              
+
               setTimeout(() => {
                 messageDiv.style.display = 'none';
               }, 3000);
@@ -231,6 +313,11 @@ app.get("/", (req, res) => {
             messageDiv.textContent = 'Hubo un error al enviar tu frase. Por favor, intenta de nuevo.';
             messageDiv.className = 'message error';
             messageDiv.style.display = 'block';
+          } finally {
+            overlay.classList.remove('show');
+            cdNumber.textContent = '';
+            cdText.style.display = 'none';
+            submitBtn.disabled = false;
           }
         });
       </script>
